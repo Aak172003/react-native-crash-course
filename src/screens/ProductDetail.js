@@ -1,0 +1,111 @@
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import React from 'react'
+import backButton from '../images/arrow.png';
+import cartIcon from '../images/cartIcon.png';
+import wishListIcon from '../images/heart.png'
+import Header from '../common/Header';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import CustomButton from '../common/CustomButton';
+import { useDispatch } from 'react-redux';
+import { addItemToWishList } from '../redux/slices/WishlistSlice';
+import Toast from 'react-native-toast-message';
+import { addItemToCart } from '../redux/slices/CartSlice';
+
+const ProductDetail = () => {
+  const navigation = useNavigation()
+  const dispatch = useDispatch()
+  const route = useRoute()
+  const { data } = route.params
+  return (
+    <View style={styles.container}>
+      <Header leftIcon={backButton} rightIcon={cartIcon} title={"Product Detail"} onClickLeftIcon={() => {
+        navigation.goBack()
+      }} isCountShow={true} />
+      <Image
+        source={{ uri: data.image }}
+        style={styles.bannerImage}
+      />
+      <Text style={styles.title}>{data?.title}</Text>
+      <Text style={styles.description}>{data?.description}</Text>
+      <View style={{ flexDirection: 'row' }}>
+        <Text style={[styles.price, { color: "#000" }]}>{"Price: "}</Text><Text style={styles.price}>{"$" + data?.price}</Text>
+      </View>
+
+      <TouchableOpacity style={styles.wishlistBtn} onPress={() => {
+        dispatch(addItemToWishList(data))
+        Toast.show({
+          type: 'success',
+          text1: '👋 Added to Wishlish',
+        });
+
+      }}>
+        <Image
+          source={wishListIcon}
+          style={styles.icon}
+        />
+
+      </TouchableOpacity>
+      <CustomButton
+        bg={'#000'}
+        title={'Add To Cart'}
+        color={"#fff"}
+        onClick={() => {
+          dispatch(addItemToCart(data))
+        }}
+      />
+
+    </View>
+  )
+}
+
+export default ProductDetail
+
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff"
+  },
+  bannerImage: {
+    width: '100%',
+    height: 300,
+    resizeMode: 'center'
+  },
+  title: {
+    fontSize: 22,
+    color: "#000",
+    fontWeight: 600,
+    marginTop: 20,
+    marginLeft: 20
+  },
+  description: {
+    fontSize: 16,
+    marginTop: 20,
+    marginLeft: 20,
+    marginRight: 20
+  },
+  price: {
+    color: 'green',
+    marginLeft: 20,
+    marginTop: 20,
+    fontSize: 20,
+    fontWeight: '600',
+    marginRight: -20
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    right: 20,
+    top: 200,
+    backgroundColor: 'red',
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 50,
+    height: 50,
+    borderRadius: 25
+  },
+  icon: {
+    width: 30,
+    height: 30,
+    padding: 2
+  }
+})

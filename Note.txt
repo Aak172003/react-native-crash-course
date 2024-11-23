@@ -1,0 +1,13 @@
+this is how start expo cli project
+npx react-native start
+
+this is how insatll dev-dependencies
+npm i @react-native-community/cli --save-dev
+
+this is how create project
+expo init ExpoProject
+
+and select 4th option : bare and minimal
+
+This is how expo-cli install
+npm install -g expo-cli
