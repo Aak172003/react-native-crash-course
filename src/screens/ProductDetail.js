@@ -21,7 +21,9 @@ const ProductDetail = () => {
 
   const wishListItems = useSelector(state => state.wishlist.data);
 
+  const cartItems = useSelector(state => state.cart.data)
   const [isLike, setIsLike] = useState(false)
+  const [inCart, setIncart] = useState(false)
 
   useEffect(() => {
     if (wishListItems.some(item => item.id === data.id)) {
@@ -29,11 +31,15 @@ const ProductDetail = () => {
     } else {
       setIsLike(false)
     }
-  }, [wishListItems])
 
+    if (cartItems.some(item => item.id === data.id)) {
+      setIncart(true)
+    }
+    else {
+      setIncart(false)
+    }
+  }, [wishListItems, cartItems])
 
-
-  console.log("this is like ------------ ", isLike)
   return (
     <View style={styles.container}>
       <Header
@@ -80,14 +86,14 @@ const ProductDetail = () => {
           <Image source={isLike ? redIcon : wishListIcon} style={styles.icon} />
         </TouchableOpacity>
 
-        <CustomButton
+        {!inCart && <CustomButton
           bg={'#000'}
           title={'Add To Cart'}
           color={"#fff"}
           onClick={() => {
             dispatch(addItemToCart(data));
           }}
-        />
+        />}
       </ScrollView>
     </View>
   );
