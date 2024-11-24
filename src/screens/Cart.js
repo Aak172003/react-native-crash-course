@@ -1,6 +1,6 @@
-import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React, { useEffect, useState } from 'react'
-import Header from '../common/Header'
+import { Dimensions, FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import Header from '../common/Header';
 import cartIcon from '../images/cartIcon.png';
 import backButton from '../images/arrow.png';
 import { useNavigation } from '@react-navigation/native';
@@ -10,23 +10,27 @@ import { addItemToCart, reduceItemFromCart, removeItemFromCart } from '../redux/
 const { height, width } = Dimensions.get('window');
 
 const Cart = () => {
+    const navigation = useNavigation();
+    const cartItem = useSelector(state => state.cart);
 
-    const navigation = useNavigation()
-    const cartItem = useSelector(state => state.cart)
-
-    const [cartData, setCartData] = useState([])
-    const dispatch = useDispatch()
-
-    console.log("form cart 0000000000000000000000000000000000000000 ", cartData)
+    const [cartData, setCartData] = useState([]);
+    const dispatch = useDispatch();
 
     useEffect(() => {
-        setCartData(cartItem.data)
-    }, [cartItem])
+        setCartData(cartItem.data);
+    }, [cartItem]);
+
     return (
-        <View>
-            <Header leftIcon={backButton} rightIcon={cartIcon} title={"Cart Item"} isCountShow={false} onClickLeftIcon={() => {
-                navigation.goBack()
-            }} />
+        <View style={styles.container}>
+            <Header
+                leftIcon={backButton}
+                rightIcon={cartIcon}
+                title={"Cart Item"}
+                isCountShow={false}
+                onClickLeftIcon={() => {
+                    navigation.goBack();
+                }}
+            />
             {cartData.length > 0 ? (
                 <FlatList
                     data={cartData}
@@ -48,52 +52,52 @@ const Cart = () => {
                                         : item.description}
                                 </Text>
 
-
                                 <View style={styles.qtyView}>
                                     <Text style={styles.price}>{"$" + item.price}</Text>
-                                    <TouchableOpacity style={styles.btn}
+                                    <TouchableOpacity
+                                        style={styles.btn}
                                         onPress={() => {
                                             if (item.qty > 1) {
-                                                dispatch(reduceItemFromCart(item))
+                                                dispatch(reduceItemFromCart(item));
                                             } else {
-                                                dispatch(removeItemFromCart(index))
+                                                dispatch(removeItemFromCart(index));
                                             }
                                         }}
                                     >
-                                        <Text style={{ fontSize: 20, fontWeight: 600 }}>-</Text>
+                                        <Text style={{ fontSize: 20, fontWeight: '600' }}>-</Text>
                                     </TouchableOpacity>
 
                                     <Text style={{ fontSize: 18, marginLeft: 10 }}>{item.qty}</Text>
 
-                                    <TouchableOpacity style={styles.btn}>
-                                        <Text style={{ fontSize: 18, fontWeight: 600 }} onPress={() => {
-                                            dispatch(addItemToCart(item))
-                                        }}>+</Text>
+                                    <TouchableOpacity
+                                        style={styles.btn}
+                                        onPress={() => {
+                                            dispatch(addItemToCart(item));
+                                        }}
+                                    >
+                                        <Text style={{ fontSize: 18, fontWeight: '600' }}>+</Text>
                                     </TouchableOpacity>
                                 </View>
                             </View>
                         </TouchableOpacity>
                     )}
                 />
-
             ) : (
                 <View style={styles.noDataContainer}>
                     <Text style={styles.noDataText}>No Data To Show</Text>
-
-
-
                 </View>
             )}
-
-
         </View>
-    )
-}
+    );
+};
 
-export default Cart
-
+export default Cart;
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1, // Ensures the container takes full screen height
+        backgroundColor: '#fff',
+    },
     productItem: {
         width: width,
         height: 100,
@@ -123,15 +127,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: '600',
     },
-    emptyText: {
-        textAlign: 'center',
-        marginTop: 20,
-        color: 'gray',
-    },
     noDataContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
+        flex: 1, // Ensures the view takes full height
+        justifyContent: 'center', // Centers content vertically
+        alignItems: 'center', // Centers content horizontally
     },
     noDataText: {
         fontSize: 18,
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
     qtyView: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: 10
+        marginTop: 10,
     },
     btn: {
         padding: 5,
@@ -149,7 +148,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         borderWidth: 0.5,
         borderRadius: 10,
-        marginLeft: 10
-
-    }
-})
+        marginLeft: 10,
+    },
+});

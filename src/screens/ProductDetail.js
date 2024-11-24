@@ -86,8 +86,7 @@ const ProductDetail = () => {
 
             if (!isUserLoggedIn) {
               setModalVisible(true)
-
-              return; // Prevent further execution if the user is not logged in
+              return;
             }
 
             const isItemInWishlist = wishListItems.some(item => item.id === data.id);
