@@ -1,65 +1,99 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import React from 'react'
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
 import backButton from '../images/arrow.png';
 import cartIcon from '../images/cartIcon.png';
-import wishListIcon from '../images/heart.png'
+import wishListIcon from '../images/heart.png';
+import redIcon from '../images/red-icon.png'
 import Header from '../common/Header';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import CustomButton from '../common/CustomButton';
-import { useDispatch } from 'react-redux';
-import { addItemToWishList } from '../redux/slices/WishlistSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { addItemToWishList, removeItemFromWishList } from '../redux/slices/WishlistSlice';
 import Toast from 'react-native-toast-message';
 import { addItemToCart } from '../redux/slices/CartSlice';
+import { ScrollView } from 'react-native';
 
 const ProductDetail = () => {
-  const navigation = useNavigation()
-  const dispatch = useDispatch()
-  const route = useRoute()
-  const { data } = route.params
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const route = useRoute();
+  const { data } = route.params;
+
+  const wishListItems = useSelector(state => state.wishlist.data);
+
+  const [isLike, setIsLike] = useState(false)
+
+  useEffect(() => {
+    if (wishListItems.some(item => item.id === data.id)) {
+      setIsLike(true)
+    } else {
+      setIsLike(false)
+    }
+  }, [wishListItems])
+
+
+
+  console.log("this is like ------------ ", isLike)
   return (
     <View style={styles.container}>
-      <Header leftIcon={backButton} rightIcon={cartIcon} title={"Product Detail"} onClickLeftIcon={() => {
-        navigation.goBack()
-      }} isCountShow={true} />
-      <Image
-        source={{ uri: data.image }}
-        style={styles.bannerImage}
+      <Header
+        leftIcon={backButton}
+        rightIcon={cartIcon}
+        title={"Product Detail"}
+        onClickLeftIcon={() => navigation.goBack()}
+        isCountShow={true}
       />
-      <Text style={styles.title}>{data?.title}</Text>
-      <Text style={styles.description}>{data?.description}</Text>
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={[styles.price, { color: "#000" }]}>{"Price: "}</Text><Text style={styles.price}>{"$" + data?.price}</Text>
-      </View>
-
-      <TouchableOpacity style={styles.wishlistBtn} onPress={() => {
-        dispatch(addItemToWishList(data))
-        Toast.show({
-          type: 'success',
-          text1: '👋 Added to Wishlish',
-        });
-
-      }}>
+      <ScrollView>
         <Image
-          source={wishListIcon}
-          style={styles.icon}
+          source={{ uri: data.image }}
+          style={styles.bannerImage}
         />
+        <Text style={styles.title}>{data?.title}</Text>
+        <Text style={styles.description}>{data?.description}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={[styles.price, { color: "#000" }]}>{"Price: "}</Text>
+          <Text style={styles.price}>{"$" + data?.price}</Text>
+        </View>
 
-      </TouchableOpacity>
-      <CustomButton
-        bg={'#000'}
-        title={'Add To Cart'}
-        color={"#fff"}
-        onClick={() => {
-          dispatch(addItemToCart(data))
-        }}
-      />
+        <TouchableOpacity
+          style={styles.wishlistBtn}
+          onPress={() => {
+            const isItemInWishlist = wishListItems.some(item => item.id === data.id);
 
+            if (isItemInWishlist) {
+              const itemIndex = wishListItems.findIndex(item => item.id === data.id);
+              dispatch(removeItemFromWishList(itemIndex));
+              Toast.show({
+                type: 'success',
+                text1: '👋 Removed from Wishlist',
+              });
+            } else {
+              dispatch(addItemToWishList(data));
+              Toast.show({
+                type: 'success',
+                text1: '👋 Added to Wishlist',
+              });
+            }
+          }}
+        >
+          {/* initial me white then red  */}
+          <Image source={isLike ? redIcon : wishListIcon} style={styles.icon} />
+        </TouchableOpacity>
+
+        <CustomButton
+          bg={'#000'}
+          title={'Add To Cart'}
+          color={"#fff"}
+          onClick={() => {
+            dispatch(addItemToCart(data));
+          }}
+        />
+      </ScrollView>
     </View>
-  )
-}
+  );
+};
 
-export default ProductDetail
-
+export default ProductDetail;
 
 const styles = StyleSheet.create({
   container: {
@@ -74,7 +108,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     color: "#000",
-    fontWeight: 600,
+    fontWeight: '600',
     marginTop: 20,
     marginLeft: 20
   },
@@ -96,7 +130,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 20,
     top: 200,
-    backgroundColor: 'red',
+    backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     width: 50,
@@ -108,4 +142,4 @@ const styles = StyleSheet.create({
     height: 30,
     padding: 2
   }
-})
+});

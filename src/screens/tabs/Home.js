@@ -23,10 +23,10 @@ const Home = () => {
         fetch("https://fakestoreapi.com/products")
             .then(res => res.json())
             .then(json => {
-                const productsWithQty = json.map(item => ({
-                    ...item,
-                    qty: 1,
-                }));
+                setProducts(json)
+                json.map((item) => {
+                    item.qty = 1
+                })
                 setProducts(productsWithQty);
                 dispatch(addProducts(productsWithQty));
             });

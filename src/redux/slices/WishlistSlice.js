@@ -7,15 +7,17 @@ const WishlsitSlice = createSlice({
     },
     reducers: {
         addItemToWishList(state, action) {
-            // get initial data 
             let tempData = state.data
-            // push new dat into intial array of data
             tempData.push(action.payload)
-            // set state.data as new updated tempData
+            state.data = tempData
+        },
+        removeItemFromWishList(state, action) {
+            let tempData = state.data
+            tempData.splice(action.payload, 1)
             state.data = tempData
         }
     }
 })
 
-export const { addItemToWishList } = WishlsitSlice.actions
+export const { addItemToWishList, removeItemFromWishList } = WishlsitSlice.actions
 export default WishlsitSlice.reducer
