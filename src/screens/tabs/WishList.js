@@ -1,16 +1,19 @@
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image, Dimensions } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import Header from '../../common/Header'
 import { useNavigation } from '@react-navigation/native';
-
 const { height, width } = Dimensions.get('window');
 
 const WishList = () => {
-
     const navigation = useNavigation()
     const Items = useSelector(state => state.wishlist)
-    const [wishListItem, setWishListItem] = useState(Items.data);
+    const [wishListItem, setWishListItem] = useState([]);
+
+    // RealTime Update 
+    useEffect(() => {
+        setWishListItem(Items.data)
+    }, [Items])
 
     return (
         <View style={styles.container}>
