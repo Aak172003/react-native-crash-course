@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Alert } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import backButton from '../images/arrow.png';
 import cartIcon from '../images/cartIcon.png';
@@ -12,6 +12,8 @@ import { addItemToWishList, removeItemFromWishList } from '../redux/slices/Wishl
 import Toast from 'react-native-toast-message';
 import { addItemToCart } from '../redux/slices/CartSlice';
 import { ScrollView } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LoginModal from '../common/LoginModal';
 
 const ProductDetail = () => {
   const navigation = useNavigation();
@@ -24,6 +26,7 @@ const ProductDetail = () => {
   const cartItems = useSelector(state => state.cart.data)
   const [isLike, setIsLike] = useState(false)
   const [inCart, setIncart] = useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
 
   useEffect(() => {
     if (wishListItems.some(item => item.id === data.id)) {
@@ -39,6 +42,21 @@ const ProductDetail = () => {
       setIncart(false)
     }
   }, [wishListItems, cartItems])
+
+
+
+  const checkUserStatus = async () => {
+
+    let isuserLoggerIn = false
+    const status = await AsyncStorage.getItem('Is_User_Logged_In')
+    if (status === null) {
+      isuserLoggerIn = false
+    } else {
+      isuserLoggerIn = true
+    }
+    return isuserLoggerIn
+  }
+
 
   return (
     <View style={styles.container}>
@@ -63,7 +81,15 @@ const ProductDetail = () => {
 
         <TouchableOpacity
           style={styles.wishlistBtn}
-          onPress={() => {
+          onPress={async () => {
+            const isUserLoggedIn = await checkUserStatus();
+
+            if (!isUserLoggedIn) {
+              setModalVisible(true)
+
+              return; // Prevent further execution if the user is not logged in
+            }
+
             const isItemInWishlist = wishListItems.some(item => item.id === data.id);
 
             if (isItemInWishlist) {
@@ -82,19 +108,41 @@ const ProductDetail = () => {
             }
           }}
         >
-          {/* initial me white then red  */}
           <Image source={isLike ? redIcon : wishListIcon} style={styles.icon} />
         </TouchableOpacity>
+
 
         {!inCart && <CustomButton
           bg={'#000'}
           title={'Add To Cart'}
           color={"#fff"}
           onClick={() => {
-            dispatch(addItemToCart(data));
+            if (checkUserStatus() === true) {
+              addItemToCart(data)
+            } else {
+              setModalVisible(true)
+            }
           }}
         />}
       </ScrollView>
+
+      <LoginModal
+        modalVisible={modalVisible}
+        onClickLogin={() => {
+          // Login Logic
+          setModalVisible(false)
+          navigation.navigate('Login')
+
+        }} onClose={() => {
+          setModalVisible(false)
+        }}
+        onClickSingnUp={() => {
+          // Register Logic
+          setModalVisible(false)
+          navigation.navigate('Signup')
+
+        }}
+      />
     </View>
   );
 };
